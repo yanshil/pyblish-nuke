@@ -141,10 +141,10 @@ def add_to_filemenu():
 
     shortcut = os.environ.get("PYBLISH_HOTKEY", "")
 
-    cmd = "import pyblish_nuke;pyblish_nuke.publish()"
-    menu.addCommand("Publish", cmd, shortcut, index=9)
+    # cmd = "import pyblish_nuke;pyblish_nuke.publish()"
+    # menu.addCommand("Publish", cmd, shortcut, index=9)
     cmd = "import pyblish_nuke;pyblish_nuke.show()"
-    menu.addCommand("Publish...", cmd, shortcut, index=10)
+    menu.addCommand("Publish", cmd, shortcut, index=10)
 
     menu.addSeparator(index=11)
 
@@ -157,13 +157,10 @@ class Splash(QtWidgets.QWidget):
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         self.setWindowFlags(
-            QtCore.Qt.WindowStaysOnTopHint |
-            QtCore.Qt.FramelessWindowHint
+            QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint
         )
 
-        pixmap = QtGui.QPixmap(
-            os.path.join(os.path.dirname(__file__), "splash.png")
-        )
+        pixmap = QtGui.QPixmap(os.path.join(os.path.dirname(__file__), "splash.png"))
         image = QtWidgets.QLabel()
         image.setPixmap(pixmap)
 
@@ -202,9 +199,7 @@ def publish():
         messagebox_text = "Publish successfull."
         if errors:
             pixmap_path = os.path.join(os.path.dirname(__file__), "failed.png")
-            messagebox_text = (
-                "Publish failed.\n\nSee script editor for details."
-            )
+            messagebox_text = "Publish failed.\n\nSee script editor for details."
 
         messagebox.setIconPixmap(QtGui.QPixmap(pixmap_path))
 
@@ -236,16 +231,15 @@ def _show_no_gui():
 
     messagebox = QtWidgets.QMessageBox()
     messagebox.setIcon(messagebox.Warning)
-    messagebox.setWindowIcon(QtGui.QIcon(os.path.join(
-        os.path.dirname(pyblish.__file__),
-        "icons",
-        "logo-32x32.svg"))
+    messagebox.setWindowIcon(
+        QtGui.QIcon(
+            os.path.join(os.path.dirname(pyblish.__file__), "icons", "logo-32x32.svg")
+        )
     )
 
     spacer = QtWidgets.QWidget()
     spacer.setMinimumSize(400, 0)
-    spacer.setSizePolicy(QtWidgets.QSizePolicy.Minimum,
-                         QtWidgets.QSizePolicy.Expanding)
+    spacer.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
 
     layout = messagebox.layout()
     layout.addWidget(spacer, layout.rowCount(), 0, 1, layout.columnCount())
@@ -256,8 +250,9 @@ def _show_no_gui():
     if not api.registered_guis():
         messagebox.setInformativeText(
             "In order to show you a GUI, one must first be registered. "
-            "Press \"Show details...\" below for information on how to "
-            "do that.")
+            'Press "Show details..." below for information on how to '
+            "do that."
+        )
 
         messagebox.setDetailedText(
             "Pyblish supports one or more graphical user interfaces "
@@ -275,13 +270,14 @@ def _show_no_gui():
             "\n"
             "\n"
             ">>> from pyblish import api\n"
-            ">>> api.register_gui(\"pyblish_lite\")"
+            '>>> api.register_gui("pyblish_lite")'
             "\n"
             "\n"
             "The next time you try running this, Lite will appear."
             "\n"
             "See http://api.pyblish.com/register_gui.html for "
-            "more information.")
+            "more information."
+        )
 
     else:
         messagebox.setInformativeText(
@@ -289,12 +285,14 @@ def _show_no_gui():
             "could be found."
             "\n"
             "\n"
-            "Press \"Show details\" for more information.")
+            'Press "Show details" for more information.'
+        )
 
         messagebox.setDetailedText(
             "These interfaces are currently registered."
             "\n"
-            "%s" % "\n".join(api.registered_guis()))
+            "%s" % "\n".join(api.registered_guis())
+        )
 
     messagebox.setStandardButtons(messagebox.Ok)
     messagebox.exec_()
@@ -310,19 +308,18 @@ def _nuke_set_zero_margins(widget_object):
     for parent in parentApp:
         for child in parent.children():
             if widget_object.__class__.__name__ == child.__class__.__name__:
+                parentWidgetList.append(parent.parentWidget())
+                parentWidgetList.append(parent.parentWidget().parentWidget())
                 parentWidgetList.append(
-                    parent.parentWidget())
-                parentWidgetList.append(
-                    parent.parentWidget().parentWidget())
-                parentWidgetList.append(
-                    parent.parentWidget().parentWidget().parentWidget())
+                    parent.parentWidget().parentWidget().parentWidget()
+                )
 
                 for sub in parentWidgetList:
-                        for tinychild in sub.children():
-                            try:
-                                tinychild.setContentsMargins(0, 0, 0, 0)
-                            except Exception:
-                                pass
+                    for tinychild in sub.children():
+                        try:
+                            tinychild.setContentsMargins(0, 0, 0, 0)
+                        except Exception:
+                            pass
 
 
 class pyblish_nuke_dockwidget(QtWidgets.QWidget):
@@ -333,7 +330,7 @@ class pyblish_nuke_dockwidget(QtWidgets.QWidget):
 
 
 def dock(window):
-    """ Expecting a window to parent into a Nuke panel, that is dockable. """
+    """Expecting a window to parent into a Nuke panel, that is dockable."""
 
     # Deleting existing dock
     # There is a bug where existing docks are kept in-memory when closed via UI
@@ -366,10 +363,9 @@ def dock(window):
     # Creating new dock
     pane = nuke.getPaneFor("Properties.1")
     widget_path = "pyblish_nuke.lib.pyblish_nuke_dockwidget"
-    panel = nukescripts.panels.registerWidgetAsPanel(widget_path,
-                                                     window.windowTitle(),
-                                                     "pyblish_nuke.dock",
-                                                     True).addToPane(pane)
+    panel = nukescripts.panels.registerWidgetAsPanel(
+        widget_path, window.windowTitle(), "pyblish_nuke.dock", True
+    ).addToPane(pane)
 
     panel_widget = panel.customKnob.getObject().widget
     panel_widget.layout().addWidget(window)
